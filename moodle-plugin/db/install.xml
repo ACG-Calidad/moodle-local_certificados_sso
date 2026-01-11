@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/certificados_sso/db" VERSION="20260108" COMMENT="XMLDB file for Moodle local/certificados_sso"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="local_certsso_tokens" COMMENT="Tabla para almacenar tokens temporales de SSO">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="token" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false" COMMENT="Token único de 64 caracteres (32 bytes en hexadecimal)"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID del usuario de Moodle"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp de creación del token"/>
+        <FIELD NAME="timeexpires" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp de expiración (5 minutos después de creación)"/>
+        <FIELD NAME="used" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Indica si el token ya fue utilizado (0=no, 1=sí)"/>
+        <FIELD NAME="ipaddress" TYPE="char" LENGTH="45" NOTNULL="false" SEQUENCE="false" COMMENT="Dirección IP del cliente que solicitó el token"/>
+        <FIELD NAME="useragent" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="User agent del navegador del cliente"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="token" UNIQUE="true" FIELDS="token" COMMENT="Índice único para búsqueda rápida de tokens"/>
+        <INDEX NAME="timeexpires" UNIQUE="false" FIELDS="timeexpires" COMMENT="Índice para limpieza eficiente de tokens expirados"/>
+        <INDEX NAME="userid_timecreated" UNIQUE="false" FIELDS="userid, timecreated" COMMENT="Índice para auditoría por usuario"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>
